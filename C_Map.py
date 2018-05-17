@@ -133,6 +133,7 @@ class Map:
                 yProcessed += 1
                 self.placeTerrain(_symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, 1, 0)
 
+        self.fillInBridges()
     def placeTerrain(self, _symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, px, py):
         bridgeSymbol = "="
         symbol = _symbol
@@ -149,79 +150,121 @@ class Map:
                 for i in range(width):
                     if self.grid[newRow][newCol] == bridgeSymbol:
                         if _symbol == '[34m~[30m':
-                            self.fillInBridges(newRow, newCol, bridgeSymbol)
+                            pass
+                            #bad place to put this line.
+
+                            #self.fillInBridges(newRow, newCol, bridgeSymbol)
                         else:
                             pass
                     else:
                         self.grid[newRow+py*i][newCol+px*i] = symbol
                         self.grid[newRow+py*i][newCol-i*px] = symbol
         except:
-            pass
+                pass
 
-    def fillInBridges(self, bridgeStartRow, bridgeStartCol, bridgeSymbol):
+    def fillInBridges(self):
+        RIVER = '[34m~[30m'
+        LEFT = 0
+        RIGHT = 1
+        UP = 2
+        DOWN = 3
+
+        rowCounter = 0
         for row in self.grid:
+            colCounter = -1
             for col in row:
+                colCounter += 1
                 if col == "=":
-                    lookingLeft = True
-                    lookingRight = False
-                    lookingUp = False
-                    lookingDown = False
-                    leftCounter = 0
-                    rightCounter = 0
-                    upCounter = 0
-                    downCounter = 0
-                    # Checking the directions!
-                    while lookingLeft:
-                        check = self.grid[bridgeStartRow][bridgeStartCol-leftCounter]
-                        if check == '~' or '=':
-                            leftCounter += 1
-                        if check != '~' or '=':
-                            lookingLeft = False
-                            lookingRight = True
-                    while lookingRight:
-                        check = self.grid[bridgeStartRow][bridgeStartCol+rightCounter]
-                        if check == "~" or '=':
-                            rightCounter += 1
-                        if check != '~' or '=':
-                            lookingRight = False
-                            lookingUp = True
-                    while lookingUp:
-                        check = self.grid[bridgeStartRow-upCounter][bridgeStartCol]
-                        if check == "~" or '=':
-                            upCounter += 1
-                        if check != '~' or '=':
-                            lookingUp = False
-                            lookingDown = True
-                    while lookingDown:
-                        check = self.grid[bridgeStartRow][bridgeStartCol-downCounter]
-                        if check == "~" or '=':
-                            downCounter += 1
-                        if check != '~' or '=':
-                            lookingDown = False
-                    leftToRight = leftCounter + rightCounter
-                    upToDown = upCounter + downCounter
-                    # Print the bridge
-                    if upToDown > leftToRight:
-                        while leftCounter > 0:
-                            leftCounter -= 1
-                            self.grid[bridgeStartRow][bridgeStartCol-leftCounter] = bridgeSymbol
-                        while rightCounter > 0:
-                            rightCounter -= 1
-                            self.grid[bridgeStartRow][bridgeStartCol+rightCounter] = bridgeSymbol
-                    if upToDown <= leftToRight:
-                        while upCounter > 0:
-                            upCounter -= 1
-                            self.grid[bridgeStartRow-upCounter][bridgeStartCol] = bridgeSymbol
-                        while downCounter > 0:
-                            downCounter -= 1
-                            self.grid[bridgeStartCol+downCounter][bridgeStartCol] = bridgeSymbol
+                    print("bridgeFound at" + str(colCounter) + " , " + str(rowCounter))
+                    distanceRight = 0
 
-    def buildRoom(self, position, size):
+                    try:
+                        while self.grid[rowCounter][colCounter + distanceRight + 1] == RIVER:
+                            distanceRight += 1
+                            print("right")
+                    except:
+                        distanceRight = 99
+                        print("exception right")
+                    distanceLeft = 0
+                    try:
+                        while self.grid[rowCounter][colCounter - distanceLeft - 1] == RIVER:
+                            distanceLeft += 1
+                            print("left")
+                    except:
+                        print("exception left")
+                        distanceLeft = 99
+                    distanceUp = 0
+                    try:
+                        while self.grid[rowCounter - distanceUp - 1][colCounter] == RIVER:
+                            distanceUp += 1
+                            print("up")
+                    except:
+                        print("exception up")
+                        distanceUp = 99
+                    distanceDown = 0
+                    try:
+                        while self.grid[rowCounter + distanceDown + 1][colCounter] == RIVER:
+                            distanceDown += 1
+                            print("down")
+
+                    except:
+                        distanceDown = 99
+                        print("exception down")
+                    results = [distanceLeft, distanceRight, distanceUp, distanceDown]
+                    min = 100
+                    for item in results:
+                        if item < min and item > 1:
+                            min = item
+                    indexOfMin = 1
+                    if not min == 100:
+                        indexOfMin = results.index(min)
+                        print(results)
+                    if results[LEFT] == 0 and results[RIGHT] == 0:
+                        print("left and right satisfied")
+                    elif results[UP] == 0 and results[DOWN] == 0:
+                        print("up and down satisfied")
+                    else:
+                        print("placed at:" + str(colCounter) + "," + str(rowCounter))
+                        if indexOfMin == LEFT:
+                            self.placeBridgeInDirectionFromRowCol((-1, 0), rowCounter, colCounter)
+                        if indexOfMin == RIGHT:
+                            self.placeBridgeInDirectionFromRowCol((1, 0), rowCounter, colCounter)
+                        if indexOfMin == UP:
+                            self.placeBridgeInDirectionFromRowCol((0, -1), rowCounter, colCounter)
+                        if indexOfMin == DOWN:
+                            self.placeBridgeInDirectionFromRowCol((0, 1), rowCounter, colCounter)
+            rowCounter += 1
+
+    def placeBridgeInDirectionFromRowCol(self,d,row,col):
+        RIVER = '[34m~[30m'
+        BRIDGE = "!"
+        print("direction = " + str(d))
+        dx = d[0]
+        dy = d[1]
+        moveX = 0
+        moveY = 0
+        currentX = col+dx
+        currentY = row+dy
+        try:
+            last = RIVER
+            while last == RIVER:
+                self.grid[currentY][currentX] = BRIDGE
+                moveX += dx
+                moveY += dy
+                currentX = col + moveX
+                currentY = row + moveY
+                last = self.grid[currentY][currentX]
+
+
+        except:
+            print("place bridge exception")
+    def buildRoom(self, position, size, doors):
+        doorSymbol = ']'
         wall = "#"
-        y = position[0]
-        x = position[1]
-        sizeY = size[0] - 1
-        sizeX = size[1] - 1
+        x = position[0]
+        y = position[1]
+        sx = size[0]
+        sy = size[1]
         # confirm room fits in map
         # build rectangle
         self.grid[x][y] = wall
@@ -328,7 +371,7 @@ class Map:
             for c in range(3):
                 targetCol = guy.col + c
                 targetRow = guy.col + r
-                if targetCol < 0 or targetRow < 0 or targetRow > self.grid.__len__() - 1 or targetCol > \
+                if targetCol < 0 or targetRow < 0 or targetRow > self.grid.__len__() - 1 or targetCol >\
                         self.grid[0].__len__() - 1:
                     print("Invalid")
                 else:
