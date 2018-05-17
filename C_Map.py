@@ -81,6 +81,10 @@ class Map:
             # self.makeTerrain(self.getRandomSpot(), Fore.YELLOW + '_' + Fore.BLACK, 3)
             # self.makeTerrain(self.getRandomBorder(), Fore.WHITE + '^' + Fore.BLACK, 2)
             self.makeTerrain(self.getRandomBorder(), Fore.BLUE + '~' + Fore.BLACK, 2)
+            self.makeTerrain(self.getRandomBorder(), Fore.BLUE + '~' + Fore.BLACK, 2)
+            self.makeTerrain(self.getRandomBorder(), Fore.BLUE + '~' + Fore.BLACK, 2)
+            self.fillInBridges()
+
             self.placeBorder()
         else:
             # Print the rooms
@@ -133,10 +137,10 @@ class Map:
                 yProcessed += 1
                 self.placeTerrain(_symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, 1, 0)
 
-        self.fillInBridges()
     def placeTerrain(self, _symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, px, py):
         bridgeSymbol = "="
         symbol = _symbol
+
         try:
             if random.randint(1, 8) == 1 and symbol[5] == '~':
                 symbol = bridgeSymbol
@@ -176,45 +180,17 @@ class Map:
                 colCounter += 1
                 if col == "=":
                     print("bridgeFound at" + str(colCounter) + " , " + str(rowCounter))
-                    distanceRight = 0
 
-                    try:
-                        while self.grid[rowCounter][colCounter + distanceRight + 1] == RIVER:
-                            distanceRight += 1
-                            print("right")
-                    except:
-                        distanceRight = 99
-                        print("exception right")
-                    distanceLeft = 0
-                    try:
-                        while self.grid[rowCounter][colCounter - distanceLeft - 1] == RIVER:
-                            distanceLeft += 1
-                            print("left")
-                    except:
-                        print("exception left")
-                        distanceLeft = 99
-                    distanceUp = 0
-                    try:
-                        while self.grid[rowCounter - distanceUp - 1][colCounter] == RIVER:
-                            distanceUp += 1
-                            print("up")
-                    except:
-                        print("exception up")
-                        distanceUp = 99
-                    distanceDown = 0
-                    try:
-                        while self.grid[rowCounter + distanceDown + 1][colCounter] == RIVER:
-                            distanceDown += 1
-                            print("down")
-
-                    except:
-                        distanceDown = 99
-                        print("exception down")
+                    distanceRight = self.getRiversInDirection(1,0,rowCounter,colCounter,"right")
+                    distanceLeft = self.getRiversInDirection(-1,0,rowCounter,colCounter,"left")
+                    distanceUp = self.getRiversInDirection(0,-1,rowCounter,colCounter,"Up")
+                    distanceDown = self.getRiversInDirection(0,1,rowCounter,colCounter,"Down")
                     results = [distanceLeft, distanceRight, distanceUp, distanceDown]
                     min = 100
                     for item in results:
                         if item < min and item > 1:
                             min = item
+
                     indexOfMin = 1
                     if not min == 100:
                         indexOfMin = results.index(min)
@@ -234,6 +210,17 @@ class Map:
                         if indexOfMin == DOWN:
                             self.placeBridgeInDirectionFromRowCol((0, 1), rowCounter, colCounter)
             rowCounter += 1
+    def getRiversInDirection(self,dx,dy,rowCounter,colCounter,directionString):
+        RIVER = '[34m~[30m'
+        ret = 0
+        try:
+            while self.grid[rowCounter+ret*dy + dy][colCounter + ret*dx + dx] == RIVER:
+                ret += 1
+                print(directionString)
+        except:
+            print("exception " + directionString)
+            return 99
+        return ret
 
     def placeBridgeInDirectionFromRowCol(self,d,row,col):
         RIVER = '[34m~[30m'
@@ -245,17 +232,13 @@ class Map:
         moveY = 0
         currentX = col+dx
         currentY = row+dy
+
         try:
-            last = RIVER
-            while last == RIVER:
-                self.grid[currentY][currentX] = BRIDGE
+            while next == RIVER:
                 moveX += dx
                 moveY += dy
-                currentX = col + moveX
-                currentY = row + moveY
-                last = self.grid[currentY][currentX]
-
-
+                next = self.grid[currentY+moveY+dy][currentX+moveX+dx]
+                self.grid[currentY+moveX][currentX+moveX] = BRIDGE
         except:
             print("place bridge exception")
     def buildRoom(self, position, size, doors):
