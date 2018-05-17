@@ -84,7 +84,7 @@ class Map:
             self.placeBorder()
         else:
             # Print the rooms
-            self.buildRoom((5, 5), (3, 4), 0)
+            self.buildRoom((5, 5), (4, 3))
 
     def placeBorder(self):
         row = 0
@@ -216,22 +216,32 @@ class Map:
                             downCounter -= 1
                             self.grid[bridgeStartCol+downCounter][bridgeStartCol] = bridgeSymbol
 
-    def buildRoom(self, position, size, doors):
-        doorSymbol = ']'
+    def buildRoom(self, position, size):
         wall = "#"
-        x = position[0]
-        y = position[1]
-        sx = size[0]
-        sy = size[1]
+        y = position[0]
+        x = position[1]
+        sizeY = size[0] - 1
+        sizeX = size[1] - 1
         # confirm room fits in map
         # build rectangle
-        for ix in range(sx):
-            self.grid[ix+x][y] = wall
-            self.grid[ix+x][y+sy] = wall
-        for iy in range(sy):
-            self.grid[x][iy+1+y] = wall
-            self.grid[x+sy][iy+1+y] = wall
+        self.grid[x][y] = wall
+        while sizeX > 0 or sizeY > 0:
+            self.grid[x][y+sizeY] = wall
+            self.grid[x+sizeX][y] = wall
+            sizeX -= 1
+            sizeY -= 1
+        sizeY = size[0] - 1
+        sizeX = size[1] - 1
+        while sizeX > 0:
+            self.grid[x+sizeX][y + sizeY] = wall
+            sizeX -= 1
+        sizeX = size[0] - 1
+        sizeY = size[1] - 1
+        while sizeY + 1 > 0:
+            self.grid[x+sizeX - 1][y+sizeY] = wall
+            sizeY -= 1
         # add doors
+        '''
         for door in range(doors):
             possibleRemainingDoors = self.cardinalPoints
             for door in range(doors-1):
@@ -240,10 +250,10 @@ class Map:
                     # place door on chosen wall
                     if d == 'north' or True:
                         doorY = y
-                        doorX = random.randint(x+1, sx+x-1)
+                        doorX = random.randint(x+1, sizeX+x-1)
                         self.grid[doorY][doorX] = doorSymbol
                     if d == 'south':
-                        doorY = random.randint(y+1, sy + y-1)
+                        doorY = random.randint(y+1, sizeY + y-1)
                         doorX = x
                         self.grid[doorY][doorX] = doorSymbol
                     if d == 'east':
@@ -251,6 +261,7 @@ class Map:
                     if d == 'west':
                         pass
                     possibleRemainingDoors.remove(d)
+        '''
 
     def saveMap(self, fileName):
         if not fileName == False:

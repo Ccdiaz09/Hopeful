@@ -15,7 +15,7 @@ class World(NavigatableMap):
         return Encounter(Map, self.player)
 
     def run(self):
-        r = random.randint(1, 1000)
+        r = random.randint(1, 1)
         self.displayAll()
         self.handleMovement(self.player)
         self.lastWorldLocationCol = self.player.col
