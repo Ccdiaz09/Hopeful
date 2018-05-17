@@ -21,8 +21,7 @@ class Map:
             self.generateMap(rows, cols, encounter)
         # fills self.grid
 
-    def getRandomBorder(self, size):
-        # gets a random border
+    def getRandomBorder(self):
         startSide = random.choice(self.cardinalPoints)
         if startSide == 'north':
             startRow = 0
@@ -37,28 +36,7 @@ class Map:
             startRow = random.randint(0, 9)
             startCol = 0
         self.cardinalPoints.remove(startSide)
-        if size == 3:
-            finishSide = random.choice(self.cardinalPoints)
-        if size == 2:
-            if startSide == 'north':
-                possibleFinish = ['east', 'west']
-            if startSide == 'south':
-                possibleFinish = ['east', 'west']
-            if startSide == 'east':
-                possibleFinish = ['north', 'south']
-            if startSide == 'west':
-                possibleFinish = ['north', 'south']
-            finishSide = random.choice(possibleFinish)
-        if size == 1:
-            if startSide == 'north':
-                possibleFinish = ['east', 'north', 'west']
-            if startSide == 'south':
-                possibleFinish = ['east', 'west', 'south']
-            if startSide == 'east':
-                possibleFinish = ['north', 'east', 'south']
-            if startSide == 'west':
-                possibleFinish = ['north', 'south', 'west']
-            finishSide = random.choice(possibleFinish)
+        finishSide = random.choice(self.cardinalPoints)
         if finishSide == 'north':
             endRow = 0
             endCol = random.randint(0, 29)
@@ -100,36 +78,33 @@ class Map:
         if not encounter:
             # Print the terrains
             self.makeTerrain(self.getRandomSpot(), Fore.GREEN + "T" + Fore.BLACK, 3)
-            # self.makeTerrain(self.getRandomBorder(2), Fore.WHITE + '^' + Fore.BLACK, 2)
             # self.makeTerrain(self.getRandomSpot(), Fore.YELLOW + '_' + Fore.BLACK, 3)
-            self.makeTerrain(self.getRandomBorder(2), Fore.BLUE + '~' + Fore.BLACK, 2)
-            self.placeBorder((9, 29))
+            # self.makeTerrain(self.getRandomBorder(), Fore.WHITE + '^' + Fore.BLACK, 2)
+            self.makeTerrain(self.getRandomBorder(), Fore.BLUE + '~' + Fore.BLACK, 2)
+            self.placeBorder()
         else:
             # Print the rooms
-            self.buildRoom((18, 9), (140, 14))
-            self.placeBorder((19, 19))
+            self.buildRoom((5, 5), (3, 4), 0)
 
-    def placeBorder(self, type):
+    def placeBorder(self):
         row = 0
         col = 0
-        numberOfRows = type[0]
-        numberOfCols = type[1]
-        for i in range(numberOfCols):
+        for i in range(29):
             self.grid[row][col] = '-'
             col += 1
         col = 0
-        for p in range(numberOfRows):
+        for p in range(9):
             self.grid[row][col] = '|'
             row += 1
         row = 0
-        for k in range(numberOfCols):
-            row = numberOfRows
+        for k in range(29):
+            row = 9
             self.grid[row][col] = '-'
             col += 1
         col = 0
         row = 0
-        for o in range(numberOfRows):
-            col = numberOfCols
+        for o in range(9):
+            col = 29
             self.grid[row][col] = '|'
             row += 1
 
@@ -181,7 +156,7 @@ class Map:
                         self.grid[newRow+py*i][newCol+px*i] = symbol
                         self.grid[newRow+py*i][newCol-i*px] = symbol
         except:
-                pass
+            pass
 
     def fillInBridges(self, bridgeStartRow, bridgeStartCol, bridgeSymbol):
         for row in self.grid:
@@ -241,33 +216,7 @@ class Map:
                             downCounter -= 1
                             self.grid[bridgeStartCol+downCounter][bridgeStartCol] = bridgeSymbol
 
-    def buildRoom(self, position, size):
-        wall = '#'
-        x = position[0]
-        y = position[1]
-        sizeX = size[0] - 1
-        sizeY = size[1] - 1
-        try:
-            self.grid[x][y] = wall
-            while sizeX > 0 or sizeY > 0:
-                self.grid[x - sizeX][y] = wall
-                self.grid[x][y - sizeY] = wall
-                sizeX -= 1
-                sizeY -= 1
-            sizeY = size[1]
-            sizeX = size[0]
-            while sizeX > 0:
-                self.grid[x - sizeX+1][y-sizeY+1] = wall
-                sizeX -= 1
-            sizeX = size[0]
-            sizeY = size[1]
-            while sizeY > 0:
-                self.grid[x - sizeX+1][y-sizeY+1] = wall
-                sizeY -= 1
-        except:
-            print('Error In the Room function')
-
-    def buildRoomOld(self, position, size, doors):
+    def buildRoom(self, position, size, doors):
         doorSymbol = ']'
         wall = "#"
         x = position[0]
@@ -344,6 +293,8 @@ class Map:
                 q = c
             if q == '~' or q == '^' or q == '#' or q == '|' or q == '-':
                 traversable = False
+            else:
+                pass
         except:
             pass
         if newCol < 0 or newCol > cols-1 or newRow < 0 or newRow > rows-1 or not traversable:
@@ -366,7 +317,7 @@ class Map:
             for c in range(3):
                 targetCol = guy.col + c
                 targetRow = guy.col + r
-                if targetCol < 0 or targetRow < 0 or targetRow > self.grid.__len__() - 1 or targetCol >\
+                if targetCol < 0 or targetRow < 0 or targetRow > self.grid.__len__() - 1 or targetCol > \
                         self.grid[0].__len__() - 1:
                     print("Invalid")
                 else:

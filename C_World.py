@@ -1,15 +1,27 @@
 from C_Encounter import *
 
 
-class World(Encounter):
+class World(NavigatableMap):
+    typeOfEncounter = Encounter.ENCOUNTER_TYPES_DIF_EASY
+
     def __init__(self, map, player):
-        super().__init__(map, player, False)
+        self.map = map
+        self.grid = self.map.grid
+        self.player = player
+        self.lastWorldLocationCol = self.player.col
+        self.lastWorldLocationRow = self.player.row
+
+    def determineEncounter(self):
+        return Encounter(Map, self.player)
 
     def run(self):
-        # world run commands...
-        r = random.randint(1, 1)
-        print(r)
-        super().run()
+        r = random.randint(1, 1000)
+        self.displayAll()
+        self.handleMovement(self.player)
+        self.lastWorldLocationCol = self.player.col
+        self.lastWorldLocationRow = self.player.row
+        print(self.lastWorldLocationCol, ',', self.lastWorldLocationRow)
         if r == 1:
             return False
-        return True
+        else:
+            return True
