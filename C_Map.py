@@ -137,10 +137,10 @@ class Map:
                 yProcessed += 1
                 self.placeTerrain(_symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, 1, 0)
 
+
     def placeTerrain(self, _symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, px, py):
         bridgeSymbol = "="
         symbol = _symbol
-
         try:
             if random.randint(1, 8) == 1 and symbol[5] == '~':
                 symbol = bridgeSymbol
@@ -180,6 +180,38 @@ class Map:
                 colCounter += 1
                 if col == "=":
                     print("bridgeFound at" + str(colCounter) + " , " + str(rowCounter))
+                    distanceRight = 0
+                    try:
+                        while self.grid[rowCounter][colCounter + distanceRight + 1] == RIVER:
+                            distanceRight += 1
+                            print("right")
+                    except:
+                        distanceRight = 99
+                        print("exception right")
+                    distanceLeft = 0
+                    try:
+                        while self.grid[rowCounter][colCounter - distanceLeft - 1] == RIVER:
+                            distanceLeft += 1
+                            print("left")
+                    except:
+                        print("exception left")
+                        distanceLeft = 99
+                    distanceUp = 0
+                    try:
+                        while self.grid[rowCounter - distanceUp - 1][colCounter] == RIVER:
+                            distanceUp += 1
+                            print("up")
+                    except:
+                        print("exception up")
+                        distanceUp = 99
+                    distanceDown = 0
+                    try:
+                        while self.grid[rowCounter + distanceDown + 1][colCounter] == RIVER:
+                            distanceDown += 1
+                            print("down")
+                    except:
+                        distanceDown = 99
+                        print("exception down")
 
                     distanceRight = self.getRiversInDirection(1,0,rowCounter,colCounter,"right")
                     distanceLeft = self.getRiversInDirection(-1,0,rowCounter,colCounter,"left")
@@ -190,7 +222,6 @@ class Map:
                     for item in results:
                         if item < min and item > 1:
                             min = item
-
                     indexOfMin = 1
                     if not min == 100:
                         indexOfMin = results.index(min)
@@ -210,6 +241,7 @@ class Map:
                         if indexOfMin == DOWN:
                             self.placeBridgeInDirectionFromRowCol((0, 1), rowCounter, colCounter)
             rowCounter += 1
+
     def getRiversInDirection(self,dx,dy,rowCounter,colCounter,directionString):
         RIVER = '[34m~[30m'
         ret = 0
@@ -232,7 +264,6 @@ class Map:
         moveY = 0
         currentX = col+dx
         currentY = row+dy
-
         try:
             while next == RIVER:
                 moveX += dx
@@ -241,13 +272,13 @@ class Map:
                 self.grid[currentY+moveX][currentX+moveX] = BRIDGE
         except:
             print("place bridge exception")
-    def buildRoom(self, position, size, doors):
-        doorSymbol = ']'
+
+    def buildRoom(self, position, size):
         wall = "#"
         x = position[0]
         y = position[1]
-        sx = size[0]
-        sy = size[1]
+        sizeY = size[0] - 1
+        sizeX = size[1] - 1
         # confirm room fits in map
         # build rectangle
         self.grid[x][y] = wall
