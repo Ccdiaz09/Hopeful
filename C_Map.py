@@ -113,7 +113,7 @@ class Map:
             self.grid[row][col] = '|'
             row += 1
 
-    def makeTerrain(self, startAndStop, _sizeYmbol, width):
+    def makeTerrain(self, startAndStop,  _symbol, width):
         startX = startAndStop[0]
         startY = startAndStop[1]
         finishX = startAndStop[2]
@@ -133,40 +133,80 @@ class Map:
             remainingYMoves = abs(dy) - abs(yProcessed)
             if remainingXMoves > remainingYMoves:
                 xProcessed += 1
-                self.placeTerrain(_sizeYmbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, 1, 0)
+                self.placeTerrain(_symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, 1, 0)
             else:
                 yProcessed += 1
-                self.placeTerrain(_sizeYmbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, 1, 0)
-
-    def placeTerrain(self, _sizeYmbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, px, py):
-        bridgesizeYmbol = "="
-        sizeYmbol = _sizeYmbol
+                self.placeTerrain(_symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, 1, 0)
+    def placeTerrain(self, _symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, px, py):
+        bridgeSymbol = "="
+        symbol = _symbol
     #hello
         try:
-            if random.randint(1, 8) == 1 and sizeYmbol[5] == '~':
-                sizeYmbol = bridgesizeYmbol
-            newCol = startY + yProcessed * directionY
-            newRow = startX + xProcessed * directionX
-            if self.grid[newRow][newCol] == bridgesizeYmbol:
+            #if random.randint(1, 8) == 1 and symbol[5] == '~':
+                #symbol = bridgeSymbol
+            newCol = startY+yProcessed*directionY
+            newRow = startX + xProcessed*directionX
+            if self.grid[newRow][newCol] == bridgeSymbol:
                 pass
             else:
-                self.grid[newRow][newCol] = sizeYmbol
+                self.grid[newRow][newCol] = symbol
             if random.randint(1, 2) == 1:
                 for i in range(width):
-                    if self.grid[newRow][newCol] == bridgesizeYmbol:
-                        if _sizeYmbol == '[34m~[30m':
+                    if self.grid[newRow][newCol] == bridgeSymbol:
+                        if _symbol == '[34m~[30m':
                             pass
-                            # bad place to put this line.
+                            #bad place to put this line.
 
-                            # self.fillInBridges(newRow, newCol, bridgesizeYmbol)
+                            #self.fillInBridges(newRow, newCol, bridgeSymbol)
                         else:
                             pass
                     else:
-                        self.grid[newRow + py * i][newCol + px * i] = sizeYmbol
-                        self.grid[newRow + py * i][newCol - i * px] = sizeYmbol
+                        self.grid[newRow+py*i][newCol+px*i] = symbol
+                        self.grid[newRow+py*i][newCol-i*px] = symbol
         except:
-            pass
+                pass
 
+    def placeBridges(self,maxNumber):
+        #look for a place that satisfies up and down or left right
+        LEFT = 0
+        RIGHT = 1
+        UP = 2
+        DOWN = 3
+        RIVER = '[34m~[30m'
+
+        rowCounter = 0
+        bridgesPlaced = 0
+        for row in self.grid:
+            colCounter = -1
+            for col in row:
+                colCounter += 1
+
+                if col == RIVER and random.randint(1,6) == 1 and bridgesPlaced < maxNumber:
+                    distanceRight = self.getRiversInDirection(1, 0, rowCounter, colCounter, "right")
+                    distanceLeft = self.getRiversInDirection(-1, 0, rowCounter, colCounter, "left")
+                    distanceUp = self.getRiversInDirection(0, -1, rowCounter, colCounter, "Up")
+                    distanceDown = self.getRiversInDirection(0, 1, rowCounter, colCounter, "Down")
+                    results = [distanceLeft, distanceRight, distanceUp, distanceDown]
+                    min = 100
+                    for item in results:
+                        if item < min and item > 1:
+                            min = item
+
+                    indexOfMin = 1
+                    if not min == 100:
+                        indexOfMin = results.index(min)
+                        print(results)
+                    if results[LEFT] == 0 and results[RIGHT] == 0:
+                        print("left and right satisfied")
+                        self.grid[rowCounter][colCounter] = '%'
+                        bridgesPlaced += 1
+                    elif results[UP] == 0 and results[DOWN] == 0:
+                        print("up and down satisfied")
+                        self.grid[rowCounter][colCounter] = '%'
+                        bridgesPlaced+=1
+
+            rowCounter += 1
+            print(bridgesPlaced)
     def fillInBridges(self):
         RIVER = '[34m~[30m'
         LEFT = 0
@@ -220,11 +260,13 @@ class Map:
                 ret += 1
                 print(directionString)
         except:
+            self.grid[rowCounter][colCounter] = RIVER
             print("exception " + directionString)
             return 99
         return ret
 
-    def placeBridgeInDirectionFromRowCol(self, d, row, col):
+    def placeBridgeInDirectionFromRowCol(self,d,row,col):
+        self.displayAll()
         RIVER = '[34m~[30m'
         BRIDGE = "!"
         print("direction = " + str(d))
@@ -235,12 +277,21 @@ class Map:
         currentX = col + dx
         currentY = row + dy
 
+        currentX = col+dx
+        currentY = row+dy
+        next = RIVER
         try:
             while next == RIVER:
                 moveX += dx
                 moveY += dy
                 next = self.grid[currentY + moveY + dy][currentX + moveX + dx]
                 self.grid[currentY + moveX][currentX + moveX] = BRIDGE
+                targetX = moveX + col
+                targetY = moveY + row
+
+                next = self.grid[targetY][targetX]
+                self.grid[targetY][targetX] = BRIDGE
+                print("placed new bridge at " )
         except:
             print("place bridge exception")
 
