@@ -140,7 +140,7 @@ class Map:
     def placeTerrain(self, _symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, px, py):
         bridgeSymbol = "="
         symbol = _symbol
-
+    #hello
         try:
             if random.randint(1, 8) == 1 and symbol[5] == '~':
                 symbol = bridgeSymbol
