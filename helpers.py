@@ -2,6 +2,14 @@ import random
 import sys
 import math
 
+def chooseItemFromNamedList(list,prompt):
+    print(prompt)
+    counter = 0
+    for item in list:
+        counter += 1
+        print(str(counter) + ":" + item.name)
+    c = getInt("Choice: ",list.__len__())
+    return list[c-1]
 
 def getInt(prompt, max, min=1):
     while True:

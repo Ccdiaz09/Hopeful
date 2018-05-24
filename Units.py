@@ -1,6 +1,6 @@
 from helpers import *
 from colorama import Fore
-
+from C_Item import *
 
 class Guy:
     def __init__(self):
@@ -14,6 +14,8 @@ class Guy:
         self.col = 1
         self.row = 1
         self.lvlUp = False
+        self.equippedItems = []
+        self.backpack = []
         # may want a weapon at some point...
 
     def getAttackRoll(self):
@@ -47,6 +49,70 @@ class Guy:
 
     def getTargetDestination(self, player):
         print("invalid use of get target destination")
+
+    def equipItem(self,item):
+        hands = []
+        usedHands = 0
+        armor = []
+        misc = []
+
+        #check current equipped items
+        for equippedItem in self.equippedItems:
+            if isinstance(equippedItem,Weapon):
+                if equippedItem.size == Weapon.LARGE:
+                    usedHands += 2
+                else:
+                    usedHands += 1
+                hands.append(equippedItem)
+            elif isinstance(equippedItem,Armor):
+                armor.append(equippedItem)
+
+            elif isinstance(equippedItem,Item):
+                misc.append(equippedItem)
+            else:
+                print("error non item held in inventory.")
+
+        #handle weapons
+        if isinstance(item,Weapon):
+            if usedHands > 0:
+                if item.size == Weapon.LARGE:
+                    for weapon in hands:
+                        self.unequipItem(weapon)
+                else:
+                    if usedHands == 2:
+                        i = chooseItemFromNamedList(hands,"What would you like to unequip?")
+                        self.unequipItem(i)
+            self.equippedItems.append(item)
+        #handle armor
+        elif isinstance(item,Armor):
+            if armor.__len__() == 0:
+                self.equippedItems.append(item)
+            else:
+                unequip = chooseItemFromNamedList(armor,"What item would you like to unequip?")
+                self.unequipItem(unequip)
+                self.equippedItems.append(item)
+        elif isinstance(item,Item):
+            if misc.__len__() < 4:
+                self.equippedItems.append(item)
+            else:
+                unequip = chooseItemFromNamedList(misc,"What item would you like to unequip?")
+                self.unequipItem(unequip)
+            pass
+
+
+
+    def unequipItem(self,item):
+        c = getInt("Would you like to put " + item.name + " in your backpack(1) or on the ground (2)?",2)
+        if c == 1:
+            self.backpack.append(item)
+        else:
+            print("You have discarded an item.")
+        self.equippedItems.remove(item)
+
+    def equipFromBackpack(self):
+        item = chooseItemFromNamedList(self.backpack,"You are rummaging through your backpack. What would you like to equip?")
+        self.equipItem(item)
+        self.backpack.remove(item)
 
 
 class Enemy(Guy):
@@ -134,3 +200,35 @@ class Player(Guy):
         direction = getInt(Fore.CYAN + "Which direction do you want to go? North:1, East:2, South:3, West:4" + Fore.BLACK, 4, 1)
         t = translateDirectionToDXAndDY(direction)
         return self.col + t[0], self.row + t[1]
+
+u = Player()
+greatSword = Weapon(Weapon.BLADE,Weapon.LARGE)
+sword = Weapon(Weapon.BLADE,Weapon.MEDIUM)
+mace = Weapon(Weapon.HAMMER,Weapon.SMALL)
+plate = Armor(Armor.PLATE,Armor.HEAVY)
+chain = Armor(Armor.PLATE,Armor.LIGHT)
+i1 = Item("A",1,1)
+i2 = Item("B",1,1)
+i3 = Item("C",1,1)
+i4 = Item("D",1,1)
+i5 = Item("E",1,1)
+
+u.backpack.append(greatSword)
+u.backpack.append(sword)
+u.backpack.append(mace)
+u.backpack.append(plate)
+u.backpack.append(chain)
+u.backpack.append(i1)
+u.backpack.append(i2)
+u.backpack.append(i3)
+u.backpack.append(i4)
+u.backpack.append(i5)
+
+while 1:
+    m = ""
+    for i in u.equippedItems:
+        m += i.name + ", "
+    print (m)
+    u.equipFromBackpack()
+
+
