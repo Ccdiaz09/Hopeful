@@ -3,9 +3,8 @@ from C_Map import *
 
 
 class NavigatableMap(Map):
-    def __init__(self, map, player, nonTraversables=[]):
+    def __init__(self, map, player):
         self.grid = map.grid
-        self.nonTraversables = nonTraversables
         self.map = map
         self.player = player
 

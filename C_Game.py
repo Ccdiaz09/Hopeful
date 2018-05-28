@@ -39,7 +39,7 @@ class Game:
             self.player.defenseSkill += 2
 
     def reset(self):
-        self.world = World(Map(10, 30, False, 'The Main World Map', False), self.player)
+        self.world = World(Map(10, 30, False, False,  'The Main World Map', False), self.player)
         self.player.hp = 110
         self.player.attackSkill = 10
         self.player.damage = 3

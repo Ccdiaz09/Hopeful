@@ -10,6 +10,8 @@ class Map:
     NON_TRAVERSABLE_CHARACTERS = ['#']
 
     def __init__(self, rows, cols, encounter=True, fileName=False, loadFile=False):
+        self.lastDoorLocation = (0, 0)
+        self.lastSide = 0
         self.grid = []
         self.nonTraversableSquares = False
         self.mapName = ""
@@ -85,32 +87,32 @@ class Map:
             self.makeTerrain(self.getRandomBorder(), Fore.BLUE + '~' + Fore.BLACK, 2)
             self.fillInBridges()
 
-            self.placeBorder((9, 29))
+            self.placeBorder((rows - 1, cols - 1), ('-', '|'))
         else:
             # Print the rooms
-            self.buildRoom((5, 4), (3, 4))
-            self.placeBorder((39, 25))
+            self.controlRooms(2, cols, rows)
+            self.placeBorder((rows - 1, cols - 1), ('#', '#'))
 
-    def placeBorder(self, size):
+    def placeBorder(self, size, symbol):
         row = 0
         col = 0
         for i in range(size[1]):
-            self.grid[row][col] = '-'
+            self.grid[row][col] = symbol[0]
             col += 1
         col = 0
         for p in range(size[0]):
-            self.grid[row][col] = '|'
+            self.grid[row][col] = symbol[1]
             row += 1
         row = 0
         for k in range(size[1]):
             row = size[0]
-            self.grid[row][col] = '-'
+            self.grid[row][col] = symbol[0]
             col += 1
         col = 0
         row = 0
         for o in range(size[0]):
             col = size[1]
-            self.grid[row][col] = '|'
+            self.grid[row][col] = symbol[1]
             row += 1
 
     def makeTerrain(self, startAndStop,  _symbol, width):
@@ -137,13 +139,14 @@ class Map:
             else:
                 yProcessed += 1
                 self.placeTerrain(_symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, 1, 0)
+
     def placeTerrain(self, _symbol, xProcessed, yProcessed, directionY, directionX, startX, startY, width, px, py):
         bridgeSymbol = "="
         symbol = _symbol
-    #hello
+    # hello
         try:
-            #if random.randint(1, 8) == 1 and symbol[5] == '~':
-                #symbol = bridgeSymbol
+            # if random.randint(1, 8) == 1 and symbol[5] == '~':
+                # symbol = bridgeSymbol
             newCol = startY+yProcessed*directionY
             newRow = startX + xProcessed*directionX
             if self.grid[newRow][newCol] == bridgeSymbol:
@@ -155,9 +158,9 @@ class Map:
                     if self.grid[newRow][newCol] == bridgeSymbol:
                         if _symbol == '[34m~[30m':
                             pass
-                            #bad place to put this line.
+                            # bad place to put this line.
 
-                            #self.fillInBridges(newRow, newCol, bridgeSymbol)
+                            # self.fillInBridges(newRow, newCol, bridgeSymbol)
                         else:
                             pass
                     else:
@@ -167,7 +170,7 @@ class Map:
                 pass
 
     def placeBridges(self,maxNumber):
-        #look for a place that satisfies up and down or left right
+        #  look for a place that satisfies up and down or left right
         LEFT = 0
         RIGHT = 1
         UP = 2
@@ -203,17 +206,17 @@ class Map:
                     elif results[UP] == 0 and results[DOWN] == 0:
                         print("up and down satisfied")
                         self.grid[rowCounter][colCounter] = '%'
-                        bridgesPlaced+=1
+                        bridgesPlaced += 1
 
             rowCounter += 1
             print(bridgesPlaced)
+
     def fillInBridges(self):
         RIVER = '[34m~[30m'
         LEFT = 0
         RIGHT = 1
         UP = 2
         DOWN = 3
-
         rowCounter = 0
         for row in self.grid:
             colCounter = -1
@@ -229,7 +232,7 @@ class Map:
                     results = [distanceLeft, distanceRight, distanceUp, distanceDown]
                     min = 100
                     for item in results:
-                        if item < min and item > 1:
+                        if min > item > 1:
                             min = item
 
                     indexOfMin = 1
@@ -274,9 +277,6 @@ class Map:
         dy = d[1]
         moveX = 0
         moveY = 0
-        currentX = col + dx
-        currentY = row + dy
-
         currentX = col+dx
         currentY = row+dy
         next = RIVER
@@ -288,14 +288,14 @@ class Map:
                 self.grid[currentY + moveX][currentX + moveX] = BRIDGE
                 targetX = moveX + col
                 targetY = moveY + row
-
                 next = self.grid[targetY][targetX]
                 self.grid[targetY][targetX] = BRIDGE
-                print("placed new bridge at " )
+                print("placed new bridge at ")
         except:
             print("place bridge exception")
 
-    def buildRoom(self, position, size):
+    def buildRoom(self, position, size, doors):
+        global sizeX, sizeY
         wall = "#"
         x = position[0]
         y = position[1]
@@ -303,16 +303,86 @@ class Map:
         sizeY = size[1]
         # confirm room fits in map
         # build rectangle
-        self.grid[x][y] = wall
         while sizeY > 0:
-            self.grid[x + sizeY - 1][y] = wall
-            self.grid[x + sizeY - 1][y + sizeX - 1] = wall
-            sizeY -= 1
+            try:
+                self.grid[x + sizeY - 1][y] = wall  # Left Side
+                self.grid[x + sizeY - 1][y + sizeX - 1] = wall  # Right Side
+                sizeY -= 1
+            except:
+                print("you get the idea")
         sizeY = size[1]
         while sizeX > 0:
-            self.grid[x][y+sizeX - 1] = wall
-            self.grid[x + sizeY - 1][y + sizeX - 1] = wall
-            sizeX -= 1
+            try:
+                self.grid[x][y+sizeX - 1] = wall  # Top Side
+                self.grid[x + sizeY - 1][y + sizeX - 1] = wall  # Bottom Side
+                sizeX -= 1
+            except:
+                print("you fucked up")
+        sizeX = size[0]
+        self.grid[x][y] = wall  # Top Left Corner
+        self.addDoorsssssssssss(doors, (x, y), (sizeX, sizeY))
+
+    def addDoorsssssssssss(self, numberOfDoors, positionOfRoom, sizeOfRoom):
+        debug = True
+        x = positionOfRoom[0]
+        y = positionOfRoom[1]
+        sizeX = sizeOfRoom[0] - 1
+        sizeY = sizeOfRoom[1] - 1
+        while numberOfDoors > 0:
+            if not debug:
+                side = random.randint(1, 4)
+                if side == 1:
+                    topRow = random.randint(y + 1, y + sizeX - 1)
+                    self.lastDoorLocation = x, topRow
+                    self.grid[x][topRow] = '!'
+                if side == 2:
+                    bottomRow = random.randint(y + 1, y + sizeX - 1)
+                    self.lastDoorLocation = x + sizeY, bottomRow
+                    self.grid[x + sizeY][bottomRow] = '!'
+                if side == 3:
+                    leftCol = random.randint(x + 1, x+sizeY - 1)
+                    self.lastDoorLocation = leftCol, y
+                    self.grid[leftCol][y] = '!'
+                if side == 4:
+                    leftCol = random.randint(x + 1, x+sizeY - 1)
+                    self.grid[leftCol][y + sizeX] = '!'
+                    self.lastDoorLocation = leftCol, y + sizeX
+            else:
+                side = 1
+                self.lastDoorLocation = x, y+1
+                self.grid[x][y + 1] = '!'
+            numberOfDoors -= 1
+            self.lastSide = side
+        return self.lastDoorLocation, self.lastSide
+
+    def controlRooms(self, numberOfRooms, cols, rows):
+        doorCount = 1
+        self.buildRoom((43, 49), (30, 8), doorCount)
+        x = cols
+        y = rows
+        numberOfRooms -= 1
+        while numberOfRooms > 0:
+            if numberOfRooms >= 2:
+                v = random.randint(1, 2)
+                if v == 1:
+                    doorCount = 2
+                else:
+                    pass
+            else:
+                pass
+            if self.lastSide == 1:
+                rowOffset = -1
+                colOffset = -1
+            if self.lastSide == 2:
+                pass
+            if self.lastSide == 3:
+                pass
+            if self.lastSide == 4:
+                pass
+            self.buildRoom((self.lastDoorLocation[0] + rowOffset, self.lastDoorLocation[1] + colOffset),
+                           (10, 10), doorCount)
+            numberOfRooms -= 1
+            doorCount = 1
 
     def saveMap(self, fileName):
         if not fileName == False:
