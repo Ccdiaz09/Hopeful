@@ -57,12 +57,12 @@ class Game:
         while self.player.hp > 0:
             self.levelUpPlayer()
             engaged = False
-            self.world.determineEncounter().run()
             if not self.world.run():
                 self.player.col = 0
                 self.player.row = 0
                 engaged = True
                 print(Fore.RED, "Start Encounter", Fore.BLACK)
+                self.world.determineEncounter().run()
             if engaged:
                 print(Fore.BLUE, "End Encounter", Fore.BLACK)
                 Encounter.encounterCounter += 1

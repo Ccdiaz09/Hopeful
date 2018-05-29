@@ -86,11 +86,10 @@ class Map:
             self.makeTerrain(self.getRandomBorder(), Fore.BLUE + '~' + Fore.BLACK, 2)
             self.makeTerrain(self.getRandomBorder(), Fore.BLUE + '~' + Fore.BLACK, 2)
             self.fillInBridges()
-
             self.placeBorder((rows - 1, cols - 1), ('-', '|'))
         else:
             # Print the rooms
-            self.controlRooms(2, cols, rows)
+            self.controlRooms(5, cols, rows)
             self.placeBorder((rows - 1, cols - 1), ('#', '#'))
 
     def placeBorder(self, size, symbol):
@@ -192,7 +191,7 @@ class Map:
                     results = [distanceLeft, distanceRight, distanceUp, distanceDown]
                     min = 100
                     for item in results:
-                        if item < min and item > 1:
+                        if min > item > 1:
                             min = item
 
                     indexOfMin = 1
@@ -338,7 +337,7 @@ class Map:
             while sizeX > 0:
                 try:
                     self.grid[x][y-sizeX + 3] = wall  # Bottom Side
-                    self.grid[x - sizeY+ 1][y - sizeX + 3] = wall  # Top Side
+                    self.grid[x - sizeY + 1][y - sizeX + 3] = wall  # Top Side
                     sizeX -= 1
                 except:
                     print("Error in 1 Bottom")
@@ -388,6 +387,7 @@ class Map:
             self.grid[self.lastDoorLocation[0]][self.lastDoorLocation[1] + 1] = '!'
             sizeX = size[0]
             self.grid[x][y] = wall  # Top Left Corner
+            sizeY = size[1]
         self.addDoorsssssssssss(doors, (x, y), (sizeX, sizeY))
 
     def addDoorsssssssssss(self, numberOfDoors, positionOfRoom, sizeOfRoom):
@@ -399,22 +399,25 @@ class Map:
         while numberOfDoors > 0:
             if not debug:
                 side = random.randint(1, 4)
-                if side == 1:
-                    topRow = random.randint(y + 1, y + sizeX - 1)
-                    self.lastDoorLocation = x, topRow
-                    self.grid[x][topRow] = '!'
-                if side == 2:
-                    bottomRow = random.randint(y + 1, y + sizeX - 1)
-                    self.lastDoorLocation = x + sizeY, bottomRow
-                    self.grid[x + sizeY][bottomRow] = '!'
-                if side == 3:
-                    leftCol = random.randint(x + 1, x+sizeY - 1)
-                    self.lastDoorLocation = leftCol, y
-                    self.grid[leftCol][y] = '!'
-                if side == 4:
-                    leftCol = random.randint(x + 1, x+sizeY - 1)
-                    self.grid[leftCol][y + sizeX] = '!'
-                    self.lastDoorLocation = leftCol, y + sizeX
+                try:
+                    if side == 1:
+                        topRow = random.randint(y + 1, y + sizeX - 1)
+                        self.lastDoorLocation = x, topRow
+                        self.grid[x][topRow] = '!'
+                    if side == 2:
+                        bottomRow = random.randint(y + 1, y + sizeX - 1)
+                        self.lastDoorLocation = x + sizeY, bottomRow
+                        self.grid[x + sizeY][bottomRow] = '!'
+                    if side == 3:
+                        leftCol = random.randint(x + 1, x+sizeY - 1)
+                        self.lastDoorLocation = leftCol, y
+                        self.grid[leftCol][y] = '!'
+                    if side == 4:
+                        leftCol = random.randint(x + 1, x+sizeY - 1)
+                        self.grid[leftCol][y + sizeX] = '!'
+                        self.lastDoorLocation = leftCol, y + sizeX
+                except:
+                    print("ERROR: No value for XY", side)
             else:
                 side = 1
                 self.lastDoorLocation = x, y+1
@@ -426,10 +429,16 @@ class Map:
     def controlRooms(self, numberOfRooms, cols, rows):
         self.buildRoom((random.randint(40, rows - 40), random.randint(40, cols - 40)), (random.randint(10, 40),
                                                                                         random.randint(8, 15)), 1, 10)
+        rowOffset = 0
+        colOffset = 0
         x = cols
         y = rows
         numberOfRooms -= 1
         while numberOfRooms > 0:
+            if numberOfRooms > 1:
+                numberOfDoors = 1
+            else:
+                numberOfDoors = 0
             if self.lastSide == 1:
                 rowOffset = -1
                 colOffset = -1
@@ -441,8 +450,12 @@ class Map:
                 colOffset = 1
             if self.lastSide == 4:
                 rowOffset = -1
-                colOffset = 1
-            self.buildRoom((self.lastDoorLocation[0] + rowOffset, self.lastDoorLocation[1] + colOffset), (random.randint(7, 20), random.randint(5, 10)), 0, self.lastSide)
+                colOffset = 11
+            try:
+                self.buildRoom((self.lastDoorLocation[0] + rowOffset, self.lastDoorLocation[1] + colOffset),
+                               (random.randint(7, 20), random.randint(8, 10)), numberOfDoors, self.lastSide)
+            except:
+                pass
             numberOfRooms -= 1
         self.lastDoorLocation = 0, 0
         self.lastSide = 0
