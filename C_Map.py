@@ -206,7 +206,6 @@ class Map:
                         print("up and down satisfied")
                         self.grid[rowCounter][colCounter] = '%'
                         bridgesPlaced += 1
-
             rowCounter += 1
             print(bridgesPlaced)
 
@@ -233,7 +232,6 @@ class Map:
                     for item in results:
                         if min > item > 1:
                             min = item
-
                     indexOfMin = 1
                     if not min == 100:
                         indexOfMin = results.index(min)
@@ -294,7 +292,6 @@ class Map:
             print("place bridge exception")
 
     def buildRoom(self, position, size, doors, original):
-        global sizeX, sizeY
         wall = "#"
         x = position[0]
         y = position[1]
