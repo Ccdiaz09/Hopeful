@@ -221,7 +221,7 @@ u.backpack.append(i3)
 u.backpack.append(i4)
 u.backpack.append(i5)
 
-for p in range(1):
+for p in range(0):
     m = ""
     for i in u.equippedItems:
         m += i.name + ", "

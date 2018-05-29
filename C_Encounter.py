@@ -37,7 +37,7 @@ class Encounter(NavigatableMap):
             self.currentEncounter = random.choice(Encounter.ENCOUNTER_TYPES_DIF_MEDIUM)
         if Encounter.encounterLevel >= 4:
             self.currentEncounter = random.choice(Encounter.ENCOUNTER_TYPES_DIF_HARD)
-        self.map = Map(100, 100, 'The Temporary Encounter Map', False)
+        self.map = Map(35, 100, 'The Temporary Encounter Map', False)
         self.player.row = 1
         self.player.col = 1
         self.grid = self.map.grid
