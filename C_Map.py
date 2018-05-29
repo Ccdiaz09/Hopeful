@@ -310,7 +310,8 @@ class Map:
                     self.grid[x + sizeY - 1][y + sizeX - 1] = wall  # Right Side
                     sizeY -= 1
                 except:
-                    print("you get the idea")
+                    print("Error in 10/2 Top")
+                    sizeY -= 1
             sizeY = size[1]
             while sizeX > 0:
                 try:
@@ -318,7 +319,8 @@ class Map:
                     self.grid[x + sizeY - 1][y + sizeX - 1] = wall  # Bottom Side
                     sizeX -= 1
                 except:
-                    print("you fucked up")
+                    print("Error in 10/2 Bottom")
+                    sizeX -= 1
             self.grid[self.lastDoorLocation[0] + 1][self.lastDoorLocation[1]] = '!'
             sizeX = size[0]
             self.grid[x][y] = wall  # Top Left Corner
@@ -330,7 +332,8 @@ class Map:
                     self.grid[x - sizeY][y - sizeX + 3] = wall  # Left Side
                     sizeY -= 1
                 except:
-                    print("you get the idea")
+                    print("Error in 1 Top")
+                    sizeY -= 1
             sizeY = size[1]
             while sizeX > 0:
                 try:
@@ -338,8 +341,52 @@ class Map:
                     self.grid[x - sizeY+ 1][y - sizeX + 3] = wall  # Top Side
                     sizeX -= 1
                 except:
-                    print("you fucked up")
+                    print("Error in 1 Bottom")
+                    sizeX -= 1
             self.grid[self.lastDoorLocation[0] - 1][self.lastDoorLocation[1]] = '!'
+            sizeX = size[0]
+            self.grid[x][y] = wall  # Top Left Corner
+        if original == 3:
+            while sizeX > 0:
+                try:
+                    self.grid[x - sizeX - 1][y - 2] = wall  # Left Side
+                    self.grid[x - sizeX - 1][y - sizeY - 1] = wall  # Right Side
+                    sizeX -= 1
+                except:
+                    print("Error in 3 Top")
+                    sizeX -= 1
+            sizeX = size[0]
+            while sizeY > 0:
+                try:
+                    self.grid[x - 2][y-sizeY - 1] = wall  # Top Side
+                    self.grid[x - sizeX - 1][y - sizeY - 1] = wall  # Bottom Side
+                    sizeY -= 1
+                except:
+                    print("Error in 3 Bottom")
+                    sizeY -= 1
+            self.grid[self.lastDoorLocation[0]][self.lastDoorLocation[1] - 1] = '!'
+            sizeX = size[0]
+            self.grid[x][y] = wall  # Top Left Corner
+        if original == 4:
+            while sizeX > 0:
+                try:
+                    self.grid[x + sizeX - 1][y] = wall  # Left Side
+                    self.grid[x + sizeX - 1][y + sizeY - 1] = wall  # Right Side
+                    sizeX -= 1
+                except:
+                    print("Error in 4 Top")
+                    sizeX -= 1
+            sizeY = size[1]
+            sizeX = size[0]
+            while sizeY > 0:
+                try:
+                    self.grid[x][y+sizeY - 1] = wall  # Top Side
+                    self.grid[x + sizeX - 1][y + sizeY - 1] = wall  # Bottom Side
+                    sizeY -= 1
+                except:
+                    print("Error in 4 Bottom")
+                    sizeY -= 1
+            self.grid[self.lastDoorLocation[0]][self.lastDoorLocation[1] + 1] = '!'
             sizeX = size[0]
             self.grid[x][y] = wall  # Top Left Corner
         self.addDoorsssssssssss(doors, (x, y), (sizeX, sizeY))
@@ -352,7 +399,7 @@ class Map:
         sizeY = sizeOfRoom[1] - 1
         while numberOfDoors > 0:
             if not debug:
-                side = random.randint(1, 2)
+                side = random.randint(3, 3)
                 if side == 1:
                     topRow = random.randint(y + 1, y + sizeX - 1)
                     self.lastDoorLocation = x, topRow
@@ -390,11 +437,13 @@ class Map:
                 rowOffset = 1
                 colOffset = -1
             if self.lastSide == 3:
-                pass
+                rowOffset = 3
+                colOffset = 1
             if self.lastSide == 4:
-                pass
+                rowOffset = -1
+                colOffset = 1
             self.buildRoom((self.lastDoorLocation[0] + rowOffset, self.lastDoorLocation[1] + colOffset),
-                           (10, 10), 0, self.lastSide)
+                           (5, 10), 0, self.lastSide)
             numberOfRooms -= 1
         self.lastDoorLocation = 0, 0
         self.lastSide = 0
