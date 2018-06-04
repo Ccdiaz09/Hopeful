@@ -303,9 +303,7 @@ class Map:
             while sizeY > 0:
                 try:
                     self.grid[x + sizeY - 1][y] = wall  # Left Side
-                    leftSide = x+sizeY-1, y
                     self.grid[x + sizeY - 1][y + sizeX - 1] = wall  # Right Side
-                    rightSide = x+sizeY-1, y+sizeX-1
                     sizeY -= 1
                 except:
                     print("Error in 10/2 Top")
@@ -314,9 +312,7 @@ class Map:
             while sizeX > 0:
                 try:
                     self.grid[x][y+sizeX - 1] = wall  # Top Side
-                    topSide = x, y+sizeX-1
                     self.grid[x + sizeY - 1][y + sizeX - 1] = wall  # Bottom Side
-                    bottomSide = x+sizeY-1, y+sizeX-1
                     sizeX -= 1
                 except:
                     print("Error in 10/2 Bottom")
@@ -329,9 +325,7 @@ class Map:
             while sizeY > 0:
                 try:
                     self.grid[x - sizeY][y + 2] = wall  # Right Side
-                    rightSide = x-sizeY, y+2
                     self.grid[x - sizeY][y - sizeX + 3] = wall  # Left Side
-                    leftSide = x-sizeY, y-sizeX+3
                     sizeY -= 1
                 except:
                     print("Error in 1 Top")
@@ -340,23 +334,18 @@ class Map:
             while sizeX > 0:
                 try:
                     self.grid[x][y-sizeX + 3] = wall  # Bottom Side
-                    bottomSide = x, y-sizeX+3
                     self.grid[x - sizeY + 1][y - sizeX + 3] = wall  # Top Side
-                    topSide = x-sizeY+1, y-sizeX+3
                     sizeX -= 1
                 except:
                     print("Error in 1 Bottom")
                     sizeX -= 1
             self.grid[self.lastDoorLocation[0] - 1][self.lastDoorLocation[1]] = '0'
             sizeX = size[0]
-            self.grid[x][y] = wall  # Top Left Corner
         if original == 3:
             while sizeX > 0:
                 try:
                     self.grid[x - sizeX - 1][y - 2] = wall  # Left Side
-                    leftSide = x-sizeX-1, y-2
                     self.grid[x - sizeX - 1][y - sizeY - 1] = wall  # Right Side
-                    rightSide = x-sizeX-1, y-sizeY-1
                     sizeX -= 1
                 except:
                     print("Error in 3 Top")
@@ -365,9 +354,7 @@ class Map:
             while sizeY > 0:
                 try:
                     self.grid[x - 2][y-sizeY - 1] = wall  # Top Side
-                    topSide = x-2, y-sizeY-1
                     self.grid[x - sizeX - 1][y - sizeY - 1] = wall  # Bottom Side
-                    bottomSide = x-sizeX-1, y-sizeY-1
                     sizeY -= 1
                 except:
                     print("Error in 3 Bottom")
@@ -378,9 +365,7 @@ class Map:
             while sizeX > 0:
                 try:
                     self.grid[x + sizeX - 1][y] = wall  # Left Side
-                    leftSide = x+sizeX-1, y
                     self.grid[x + sizeX - 1][y + sizeY - 1] = wall  # Right Side
-                    rightSide = x+sizeX - 1, y+sizeY-1
                     sizeX -= 1
                 except:
                     print("Error in 4 Top")
@@ -390,9 +375,7 @@ class Map:
             while sizeY > 0:
                 try:
                     self.grid[x][y+sizeY - 1] = wall  # Top Side
-                    topSide = x, y+sizeY-1
                     self.grid[x + sizeX - 1][y + sizeY - 1] = wall  # Bottom Side
-                    bottomSide = x+sizeX - 1, y+sizeY-1
                     sizeY -= 1
                 except:
                     print("Error in 4 Bottom")
@@ -401,36 +384,49 @@ class Map:
             sizeX = size[0]
             self.grid[x][y] = wall  # Top Left Corner
             sizeY = size[1]
-        self.addDoorsssssssssss(doors, (x, y), (sizeX, sizeY))
+        self.addDoors(doors, (x, y), (sizeX, sizeY), original)
 
-    def addDoorsssssssssss(self, numberOfDoors, positionOfRoom, sizeOfRoom):
+    def addDoors(self, numberOfDoors, positionOfRoom, sizeOfRoom, original):
         debug = False
         side = 0
         x = positionOfRoom[0]
         y = positionOfRoom[1]
         sizeX = sizeOfRoom[0] - 1
         sizeY = sizeOfRoom[1] - 1
+        xValue = sizeX
+        yValue = sizeY
+        if original == 3:
+            pass
+        if original == 1:
+            xValue = -sizeX
+            yValue = -sizeY
+        if original == 2:
+            xValue = sizeX
+            yValue = -sizeY
+        if original == 4:
+            xValue = -sizeX
+            yValue = sizeY
         while numberOfDoors > 0:
             if not debug:
                 while side == self.lastSide:
                     side = random.randint(1, 4)
                 try:
                     if side == 1:
-                        topRow = random.randint(y + 1, y + sizeX - 1)
+                        topRow = random.randint(y + 1, y + xValue - 1)
                         self.lastDoorLocation = x, topRow
                         self.grid[x][topRow] = '!'
                     if side == 2:
-                        bottomRow = random.randint(y + 1, y + sizeX - 1)
-                        self.lastDoorLocation = x + sizeY, bottomRow
-                        self.grid[x + sizeY][bottomRow] = '!'
+                        bottomRow = random.randint(y + 1, y + xValue - 1)
+                        self.lastDoorLocation = x + yValue, bottomRow
+                        self.grid[x + yValue][bottomRow] = '!'
                     if side == 3:
-                        leftCol = random.randint(x + 1, x+sizeY - 1)
+                        leftCol = random.randint(x + 1, x+yValue - 1)
                         self.lastDoorLocation = leftCol, y
                         self.grid[leftCol][y] = '!'
                     if side == 4:
-                        leftCol = random.randint(x + 1, x+sizeY - 1)
-                        self.grid[leftCol][y + sizeX] = '!'
-                        self.lastDoorLocation = leftCol, y + sizeX
+                        leftCol = random.randint(x + 1, x+yValue - 1)
+                        self.grid[leftCol][y + xValue] = '!'
+                        self.lastDoorLocation = leftCol, y + xValue
                 except:
                     print("ERROR: No value for XY", side)
             else:
@@ -439,7 +435,6 @@ class Map:
                 self.grid[x][y + 1] = '!'
             numberOfDoors -= 1
             self.lastSide = side
-        return self.lastDoorLocation, self.lastSide
 
     def controlRooms(self, numberOfRooms, cols, rows):
         rowOffset = 0
@@ -451,7 +446,7 @@ class Map:
         numberOfRooms -= 1
         while numberOfRooms > 0:
             if numberOfRooms > 1:
-                numberOfDoors = 200
+                numberOfDoors = 1
             else:
                 numberOfDoors = 0
             if self.lastSide == 1:
@@ -470,10 +465,8 @@ class Map:
                 self.buildRoom((self.lastDoorLocation[0] + rowOffset, self.lastDoorLocation[1] + colOffset),
                                (random.randint(7, 20), random.randint(8, 10)), numberOfDoors, self.lastSide)
             except:
-                pass
+                print(self.grid)
             numberOfRooms -= 1
-        self.lastDoorLocation = 0, 0
-        self.lastSide = 0
 
     def saveMap(self, fileName):
         if not fileName == False:
